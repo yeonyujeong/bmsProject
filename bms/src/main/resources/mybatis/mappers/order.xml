@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.order">
+
+	 <select id="selectMyOrderList" resultType="OrderDTO"  parameterType="OrderDTO"  >
+	    <![CDATA[
+			SELECT 
+					* 
+			FROM 
+					T_SHOPPING_ORDER
+			WHERE 	
+					TO_CHAR(PAY_ORDER_TIME,'yyyy-MM-dd') = TO_CHAR(SYSDATE,'yyyy-MM-dd') AND 
+					MEMBER_ID = #{memberId}
+        	ORDER BY 
+        			PAY_ORDER_TIME DESC
+		]]>
+	</select> 
+	
+	<insert id="insertNewOrder" parameterType="OrderDTO">
+	    <selectKey resultType="int" keyProperty="orderSeqNum" order="BEFORE">
+	    	SELECT 
+	    			ORDER_SEQ_NUM.NEXTVAL 
+	    	FROM 
+	    			DUAL
+	    </selectKey>
+	    <![CDATA[
+			INSERT INTO T_SHOPPING_ORDER VALUES(
+		     		#{orderSeqNum},
+		            #{orderId},
+				    #{memberId},
+				    #{goodsId},
+				    #{ordererName},
+				    #{goodsTitle},
+				    #{orderGoodsQty},
+				    #{goodsSalesPrice},
+				    #{goodsFileName},
+				    #{receiverName},
+				    #{receiverHp1},
+                    #{receiverHp2},
+                    #{receiverHp3},
+                    #{receiverTel1},
+                    #{receiverTel2},
+                    #{receiverTel3},
+                    #{deliveryAddress},
+	                #{deliveryMethod},
+                    #{deliveryMessage},
+	                #{giftWrapping},
+	                #{payMethod},
+	                #{cardComName},
+	                #{cardPayMonth},
+	                #{ordererHp},
+	                #{payOrdererHpNum},
+	                'deliveryPrepared',
+	                sysdate
+	          )
+    	]]>
+	</insert>
+
+	
+   <select id="selectOrderID" resultType="int"  >
+	    <![CDATA[
+		    SELECT 
+		    		ORDER_SEQ_NUM.NEXTVAL   
+		    FROM 
+		    		DUAL
+    	]]>
+	</select>
+	
+	<select id="selectMyOrder" resultType="OrderDTO" parameterType="String"  >
+	    <![CDATA[
+		    SELECT 
+		    		* 
+		    FROM 
+		    		T_SHOPPING_ORDER
+            WHERE 
+            		TO_CHAR(PAY_ORDER_TIME,'yyyy-MM-dd') = TO_CHAR(SYSDATE,'yyyy-mm-dd') AND 
+            		ORDER_ID = #{orderId}
+            ORDER BY 
+            		PAY_ORDER_TIME DESC
+    	]]>
+	</select>
+	
+	<delete id="deleteGoodsFromCart" parameterType="OrderDTO">
+	  DELETE FROM 
+	  			T_SHOPPING_CART
+	  WHERE 
+	  			GOODS_ID = #{goodsId}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.cart">
+	
+	<select id="selectCartList" parameterType="CartDTO"  resultType="CartDTO"   >
+	    <![CDATA[
+			SELECT 
+					*
+			FROM 
+					T_SHOPPING_CART 
+			WHERE 
+					MEMBER_ID = #{memberId} 
+		]]>
+	</select>
+
+	<select id="selectGoodsList" resultType="GoodsDTO" parameterType="java.util.Map">
+      <![CDATA[
+          SELECT 
+          			G.*,
+          			D.FILE_NAME AS goodsFileName
+          FROM 
+          			T_SHOPPING_GOODS G
+          				  INNER JOIN T_GOODS_DETAIL_IMAGE D
+         						  ON G.GOODS_ID = D.GOODS_ID 
+         						 AND D.FILE_TYPE = 'main_image'
+         						 AND G.GOODS_ID IN
+      ]]>
+									<foreach item="item" collection="list" open="(" separator="," close=")">
+										#{item.goodsId}
+									</foreach>
+		ORDER BY 
+			G.GOODS_CREDATE DESC
+	</select>
+
+	<select id="selectCountInCart" resultType="String" parameterType="CartDTO">
+	    <![CDATA[
+		    SELECT 
+		    		
+		    		DECODE(COUNT(*), 0, 'false', 'true') 
+		   	FROM 
+		   			T_SHOPPING_CART
+			WHERE 
+					GOODS_ID = #{goodsId} AND MEMBER_ID = #{memberId} 
+
+    	]]>
+	</select>
+
+	<insert id="insertGoodsInCart" parameterType="CartDTO">
+	    <![CDATA[
+	    	INSERT INTO T_SHOPPING_CART VALUES (
+		    	 #{cartId},
+		         #{goodsId},
+		         #{memberId},
+		         #{cartGoodsQty},
+		         sysdate
+		    )
+    	]]>
+	</insert>
+
+	<update id="updateCartGoodsQty" parameterType="CartDTO">
+	    <![CDATA[
+			UPDATE 
+					T_SHOPPING_CART
+			SET 
+					CART_GOODS_QTY = #{cartGoodsQty}
+		 	WHERE 
+		 			MEMBER_ID = #{memberId} AND GOODS_ID = #{goodsId}
+    	]]>
+	</update>
+	
+	<delete id="deleteCartGoods" parameterType="int">
+	    <![CDATA[
+	      DELETE FROM 
+	      			T_SHOPPING_CART
+	      WHERE 
+	      			CART_ID = #{cartId}
+    	]]>
+	</delete>
+	
+	<select id="selectMaxCartId" resultType="int">
+	    <![CDATA[
+			SELECT 
+					NVL(MAX(CART_ID), 0) + 1 
+			FROM 
+					T_SHOPPING_CART 
+    	]]>
+	</select>
+
+</mapper>

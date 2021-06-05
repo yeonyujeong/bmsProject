@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.admin.order">
+
+	<select id="selectNewOrderList" resultType="OrderDTO" parameterType="java.util.HashMap"  >
+		 SELECT  
+  					*  
+  		  FROM 
+  		  			T_SHOPPING_ORDER 
+         WHERE 
+         			TO_CHAR(PAY_ORDER_TIME,'yyyy-mm-dd') BETWEEN #{beginDate} AND #{endDate}
+         			<if test="search_word != '' ">
+	                <if test="search_type=='all'">
+	                  AND ORDERER_NAME 	like '%'|| #{search_word} || '%'
+	                   OR GOODS_TITLE 	like '%'|| #{search_word} || '%' 
+	                </if>
+	                <if test="search_type=='orderer_name'">
+	                  AND ORDERER_NAME LIKE '%'|| #{search_word} || '%'
+	                </if>
+	                <if test="search_type=='goodsTitle'">
+	                   AND GOODS_TITLE LIKE '%'|| #{search_word} || '%'
+	                </if>
+                </if>
+         ORDER BY 
+         			PAY_ORDER_TIME DESC
+					 	        
+	</select>
+	
+	
+	<update id="updateDeliveryState" parameterType="java.util.Map" >
+	   UPDATE T_SHOPPING_ORDER
+	    <set> 
+	      <if test="deliveryState!='' and deliveryState!=null">
+	        DELIVERY_STATE = #{deliveryState}
+	      </if>
+	    </set>
+	    WHERE 
+	    		ORDER_ID = #{orderId}
+	</update>
+		
+	
+    <select id="selectOrderDetail" resultType="OrderDTO"   parameterType="int"  >
+	    <![CDATA[
+		    SELECT 
+		    		* 
+		    FROM 
+		    		T_SHOPPING_ORDER
+            WHERE 
+            		ORDER_ID = #{orderId}
+    	]]>
+	</select>	
+	
+	
+	<select id="selectOrderer" resultType="MemberDTO"  parameterType="String"  >
+	    <![CDATA[
+			SELECT 
+					* 
+			FROM 
+					T_SHOPPING_MEMBER 
+			WHERE 
+					MEMBER_ID = #{memberId}
+		]]>
+	</select>	
+	
+</mapper>
